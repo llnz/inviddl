@@ -2,8 +2,7 @@
 # Copyright Lee Begg 2009
 #
 # NZ Herald video download tool
-#
-# Borrowing heavily from youtube-dl
+# Licence: GPL v2 or later
 
 
 import sys

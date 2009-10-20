@@ -2,8 +2,7 @@
 # Copyright Lee Begg 2009
 #
 # 3news video download tool
-#
-# Borrowing heavily from youtube-dl
+# Licence: GPL v2 or later
 
 import re
 import sys
