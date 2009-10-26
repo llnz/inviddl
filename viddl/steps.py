@@ -9,6 +9,7 @@
 import urllib2
 import httplib
 import socket
+import sys
 import time
 
 const_initial_block_size = 10 * 1024
