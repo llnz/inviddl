@@ -8,7 +8,7 @@
 
 import sys
 import re
-from viddl.steps import download_step, http_download_video_step, extract_step
+from viddl.steps import download_step, download_video_step, extract_step
 
 
 const_video_url_param_re = re.compile(r'flashvars="file=([^&]+)&')
@@ -34,7 +34,7 @@ video_url_real = const_video_url_real_fmt % video_url_param
 
 video_filename = video_url_real.split('/')[-1]
 
-http_download_video_step(video_filename, video_url_real)
+download_video_step(video_filename, video_url_real)
 # Finish
 sys.exit()
 

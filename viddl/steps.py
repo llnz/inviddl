@@ -87,6 +87,13 @@ def extract_step(step_title, step_error, regexp, data):
         except KeyboardInterrupt:
                 sys.exit('\n')
 
+def download_video_step(video_filename, video_url):
+    if(video_url.startswith('http://')):
+        http_download_video_step(video_filename, video_url)
+    else:
+        print("Unable to download video, not http. Actual url is: %s", video_url)
+        
+
 def http_download_video_step(video_filename, video_url):
     try:
         print('Requesting video file... ')
