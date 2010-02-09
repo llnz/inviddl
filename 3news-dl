@@ -27,6 +27,10 @@ video_url = req_url
 video_webpage = download_step(True, 'Retrieving video webpage', 'unable to retrieve video webpage', video_url)
 
 video_url_param = extract_step('Extracting video URL parameter', 'unable to extract video URL parameter', const_video_url_param_re, video_webpage)
+
+if video_url_param[0] != '/':
+    video_url_param = video_url_param.replace(video_url_param[0], '/')
+
 video_url_real = const_video_url_real_fmt % (video_url_param, video_speed)
 
 video_filename = video_url_real.split('/')[-1]
