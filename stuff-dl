@@ -1,0 +1,55 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright Lee Begg 2011
+#
+# Stuff.co.nz video download tool
+# Licence: GPL v2 or later
+
+
+import sys
+import re
+import urllib2
+from viddl.steps import download_step, extract_step, download_video_step
+
+
+const_xml_url_param_re = re.compile(r".*mediaXML:.*'http://([^']+)'.*")
+const_xml_url_real_fmt = "http://%s"
+const_video_url_param_re = re.compile(r'.*<media:content url="http://([^"]+)".*')
+const_video_url_real_fmt = "http://%s"
+
+
+
+
+if(len(sys.argv) > 1):
+    req_url = sys.argv[1]
+    
+else:
+    print("Usage: %s url" % sys.argv[0])
+    sys.exit(1)
+    
+
+#should check url first
+video_url = req_url
+
+video_webpage = download_step(True, 'Retrieving video webpage', 'unable to retrieve video webpage', video_url)
+
+
+xml_url_param = extract_step('Extracting XML URL parameter', 'unable to extract XML URL parameter', const_xml_url_param_re, video_webpage)
+
+xml_url_real = const_xml_url_real_fmt % (xml_url_param)
+
+xml_page = download_step(True, 'Retrieving XML page', 'unable to retrieve xml page', xml_url_real)
+
+video_url_param = extract_step('Extract video url parameter', 'unable to extract video url parameter', const_video_url_param_re, xml_page)
+
+video_url_real = const_video_url_real_fmt % (video_url_param)
+
+print video_url_real
+
+video_filename = video_url_real.split('/')[-1]
+
+download_video_step(video_filename, video_url_real)
+
+# Finish
+sys.exit()
+
