@@ -11,7 +11,7 @@ import re
 from xml.etree import ElementTree as ET
 from viddl.steps import download_step, extract_step, download_video_step
 
-const_xmlfile_re = re.compile(r"flashVars.*=.*'.*&amp;xmlURL=([^']+)';")
+const_xmlfile_re = re.compile(r"flashVars.*=.*'.*&amp;xmlURL=([^'&]+)(?:&.*)*';")
 const_xmlfile_url_fmt = "http://www.nzonscreen.com%s"
 
 
