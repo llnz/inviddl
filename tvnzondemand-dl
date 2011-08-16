@@ -42,11 +42,17 @@ smildoc = ET.fromstring(smil_file)
 print('Extracting video urls')
 
 listofvideotags = smildoc.findall('.//{http://www.w3.org/ns/SMIL}video')
-videos = []
+videosbybitrate = {}
 
 for videotag in listofvideotags:
-	if videotag.get('systemBitrate') == '700000':
-		videos.append(videotag.get('src'))
+	bitrate = int(videotag.get('systemBitrate'))
+	brvideos = videosbybitrate.get(bitrate)
+        if brvideos is None:
+		brvideos = []
+		videosbybitrate[bitrate] = brvideos
+	brvideos.append(videotag.get('src'))
+
+videos = videosbybitrate[max(videosbybitrate.keys())]
 
 for video_url_real in videos:
 	
