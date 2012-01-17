@@ -1,4 +1,3 @@
-'''The main inviddl code'''
 #    Copyright (C) 2012 by Lee Begg                                      
 #    <llnz@paradise.net.nz>                                                             
 #
@@ -24,38 +23,15 @@
 #LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
 #OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
 #OF THE POSSIBILITY OF SUCH DAMAGE.
-import sys
 
+import re
 
-from viddl.sites import get_site
+from viddl.patterns import FileVarDownloadSite
+from viddl.sites import register_site
 
-#load site modules
-from viddl.sites import nz3news, stuff, ch9nz
-
-def main():
+@register_site(r'http://(www\.)?ch9\.co\.nz/')
+class Ch9nz(FileVarDownloadSite):
+    const_video_url_param_re = re.compile(r'flashvars="file=([^&]+)&')
     
-    #parse args
-    if len(sys.argv) != 2:
-        sys.exit('Usage: %s url [url ...]' % sys.argv[0])
-    urls = sys.argv[1:]
-    
-    
-    for url in urls:
-        #check url to find site
-        site = get_site(url)
-        #if found
-        if site is not None:
-            print 'Found site %s' % site.__class__.__name__
-            #site.download_from_url
-            site.download_from_url(url)
-        #else
-        else:
-            print "fail"
-            #download page
-            #check resulting url to find site
-            #if found
-                #site.download_from_page
-            #else
-                #try default downloaders
-    
-    pass
+    def video_url_from_param(self, video_url_param):
+        return video_url_param
