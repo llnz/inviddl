@@ -34,7 +34,7 @@ from viddl.sites import register_site
 class Nz3News(FileVarDownloadSite):
     const_video_url_param_re = re.compile(r'var video ="([^"]+)"')
     const_video_url_real_fmt = "http://flash.mediaworks.co.nz/tv3/streams/_definst_%s_%s.mp4"
-    video_speed = "330K"
+    video_speed = "700K"
     
     def video_url_from_param(self, video_url_param):
         if video_url_param[0] != '/':
