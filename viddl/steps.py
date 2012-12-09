@@ -35,6 +35,20 @@ import time
 const_initial_block_size = 10 * 1024
 const_epsilon = 0.0001
 
+class InviddlError(Exception):
+    '''Retryable error for Inviddl'''
+    pass
+
+def retry(func):
+    
+    def retry_wrapper(*args, **kwargs):
+        for _loop in (0, 1, 2):
+            try:
+                return func(*args, **kwargs)
+            except InviddlError:
+                pass
+        
+    return retry_wrapper
 
 # Calculate new block size based on previous block size
 def new_block_size(before, after, bytes):
@@ -74,6 +88,7 @@ def perform_request(url, headers=None, data=None):
         return response
 
 #generic download step
+@retry
 def download_step(return_data_flag, step_title, step_error, url, post_data=None):
         try:
                 print('%s... ' % step_title)
@@ -85,7 +100,7 @@ def download_step(return_data_flag, step_title, step_error, url, post_data=None)
 
         except (urllib2.URLError, ValueError, httplib.HTTPException, TypeError, socket.error):
                 print('failed.\n')
-                sys.exit(step_error)
+                raise InviddlError(step_error)
 
         except KeyboardInterrupt:
                 sys.exit('\n')
@@ -112,18 +127,26 @@ def download_video_step(video_filename, video_url):
         http_download_video_step(video_filename, video_url)
     else:
         print("Unable to download video, not http. Actual url is: %s" % video_url)
-        
 
+@retry
 def http_download_video_step(video_filename, video_url):
+    try:
+        video_file = open(video_filename, 'wb')
+    except (IOError, OSError):
+        sys.exit('Error: unable to open "%s" for writing.' % video_filename)
+                
+    http_download_video_to_file_step(video_file, video_url)
+    
+    video_file.close()
+    print('Video data saved to %s\n' % video_filename)
+
+
+def http_download_video_to_file_step(video_file, video_url):
     try:
         print('Requesting video file... ')
         video_data = perform_request(video_url)
         print('done.\n')
     
-        try:
-                video_file = open(video_filename, 'wb')
-        except (IOError, OSError):
-                sys.exit('Error: unable to open "%s" for writing.' % video_filename)
         try:
                 video_len = long(video_data.info()['Content-length'])
                 #video_len_str = format_bytes(video_len)
@@ -158,15 +181,13 @@ def http_download_video_step(video_filename, video_url):
             block_size = new_block_size(before, after, dl_bytes)
     
         if video_len is not None and byte_counter != video_len:
-                sys.exit('server did not send the expected amount of data')
+                raise InviddlError('server did not send the expected amount of data')
     
-        video_file.close()
         print('done.\n')
-        print('Video data saved to %s\n' % video_filename)
-    
+        
     except (urllib2.URLError, ValueError, httplib.HTTPException, TypeError, socket.error):
             print('failed.\n')
-            sys.exit('unable to download video data')
+            raise InviddlError('unable to download video data')
     
     except KeyboardInterrupt:
             sys.exit('\n')
