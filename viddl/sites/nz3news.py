@@ -26,27 +26,32 @@
 
 import re
 
-from viddl.patterns import FileVarDownloadSite
+from viddl.patterns import M3uPlaylistVarDownloadSite
 from viddl.sites import register_site
 
 @register_site(r'http://(www\.)?3news\.co\.nz/', 
                r'http://feedproxy\.google\.com/~r/Tv3LatestNewsVideo/')
-class Nz3News(FileVarDownloadSite):
-    const_video_url_param_re = re.compile(r'var video ="([^"]+)"')
-    const_video_url_real_fmt = "http://flash.mediaworks.co.nz/tv3/streams/_definst_%s_%s.mp4"
+class Nz3News(M3uPlaylistVarDownloadSite):
+    const_playlist_url_param_re = re.compile(r'var video ="([^"]+)"')
+    const_playlist_url_real_fmt = "http://non-geo.3news.co.nz/vod/_definst_/mp4:3news%s_%s.mp4/playlist.m3u8"
+    const_video_filename_real_fmt = "%s_%s.mp4"
     video_speed = "700K"
     
-    def video_url_from_param(self, video_url_param):
-        if video_url_param[0] != '/':
-            video_url_param = video_url_param.replace(video_url_param[0], '/')
+    def playlist_url_from_param(self, playlist_url_param):
+        if playlist_url_param[0] != '/':
+            playlist_url_param = playlist_url_param.replace(playlist_url_param[0], '/')
         else:
-            video_url_param = video_url_param.replace('*', '/')
+            playlist_url_param = playlist_url_param.replace('*', '/')
         
-        if video_url_param[:2] == '//':
-            video_url_param = video_url_param[1:]
+        if playlist_url_param[:2] == '//':
+            playlist_url_param = playlist_url_param[1:]
         
-        video_url_real = self.const_video_url_real_fmt % (video_url_param, self.video_speed)
-        return video_url_real
+        playlist_url_real = self.const_playlist_url_real_fmt % (playlist_url_param, self.video_speed)
+        return playlist_url_real
 
+    def filename_from_param(self, playlist_url_param):
+        '''Return the video filename for the given param.'''
+        return (self.const_video_filename_real_fmt % (playlist_url_param, self.video_speed)).split('/')[-1]
+    
 #Nz3News = register_site(Nz3News, r'http://(www\.)?3news\.co\.nz/', 
 #               r'http://feedproxy\.google\.com/~r/Tv3LatestNewsVideo/')

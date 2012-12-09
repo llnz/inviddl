@@ -30,6 +30,8 @@ behavour as needed
 #OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from xml.etree import ElementTree as ET
+import sys, os
+import shutil
 
 from viddl.steps import download_step, download_video_step, extract_step
 
@@ -115,3 +117,72 @@ class FileVarDownloadSite(VideoSite):
         download_video_step(video_filename, video_url_real)
 
 
+class M3uPlaylistVarDownloadSite(VideoSite):
+    '''Page contains a variable which with a url formater can be turned into 
+    the M3u Playlist url to download from'''
+    
+    const_playerlist_url_param_re = None
+    
+    def playlist_url_from_param(self, param):
+        '''Return the playlist url for the given param.'''
+        raise NotImplementedError()
+
+    def filename_from_param(self, param):
+        '''Return the video filename for the given param.'''
+        raise NotImplementedError()
+    
+    def download_from_page(self, url, page):
+        playlist_url_param = extract_step('Extracting video URL parameter', 'unable to extract video URL parameter', self.const_playlist_url_param_re, page)
+        
+        print "raw playlist_url_param:", playlist_url_param
+        
+        playlist_url_real = self.playlist_url_from_param(playlist_url_param)
+        
+        video_filename = self.filename_from_param(playlist_url_param)
+        print "Final filename:", video_filename
+        
+        print playlist_url_real
+        
+        playlist_webpage = download_step(True, 'Retrieving playlist', 'unable to retrieve playlist', playlist_url_real)
+        
+        chunklist_file = [line for line in playlist_webpage.splitlines() if line[0] != '#'][0]
+        
+        print chunklist_file
+        
+        chunklist_url = playlist_url_real.rsplit('/', 1)[0] + '/' + chunklist_file
+        
+        print chunklist_url
+        
+        chunklist_webpage = download_step(True, 'Retrieving chunklist', 'unable to retrieve chunklist', chunklist_url)
+        
+        video_items = [line for line in chunklist_webpage.splitlines() if line[0] != '#']
+        
+        print video_items
+        
+        tmp_dir = video_filename + '_tmp'
+        
+        if not os.path.exists(tmp_dir):
+            os.mkdir(tmp_dir)
+        
+        real_video_items = []
+        for video_item in video_items:
+            real_item = video_item.split('?', 1)[0]
+            real_video_items.append(real_item)
+            if not os.path.exists(os.path.join(tmp_dir, real_item)):
+                download_video_step(os.path.join(tmp_dir, real_item + "_tmp"),  chunklist_url.rsplit('/', 1)[0] + '/' + video_item)
+                shutil.move(os.path.join(tmp_dir, real_item + "_tmp"), os.path.join(tmp_dir, real_item))
+        
+        try:
+            video_file = open(video_filename, 'wb')
+        except (IOError, OSError):
+            sys.exit('Error: unable to open "%s" for writing.' % video_filename)
+        
+        for video_item in real_video_items:
+            with open(os.path.join(tmp_dir, video_item), 'rb') as in_file:
+                video_file.write(in_file.read())
+        
+        video_file.close()
+        print('Video data saved to %s\n' % video_filename)
+        
+        shutil.rmtree(tmp_dir)
+        
