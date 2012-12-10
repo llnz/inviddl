@@ -47,6 +47,8 @@ def retry(func):
                 return func(*args, **kwargs)
             except InviddlError:
                 pass
+        #Once more, raises error
+        return func(*args, **kwargs)
         
     return retry_wrapper
 
