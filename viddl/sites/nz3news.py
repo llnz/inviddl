@@ -1,4 +1,4 @@
-#    Copyright (C) 2012 by Lee Begg                                      
+#    Copyright (C) 2012, 2013 by Lee Begg                                      
 #    <llnz@paradise.net.nz>                                                             
 #
 #All rights reserved.
@@ -33,7 +33,7 @@ from viddl.sites import register_site
                r'http://feedproxy\.google\.com/~r/Tv3LatestNewsVideo/')
 class Nz3News(M3uPlaylistVarDownloadSite):
     const_playlist_url_param_re = re.compile(r'var video ="([^"]+)"')
-    const_playlist_url_real_fmt = "http://non-geo.3news.co.nz/vod/_definst_/mp4:3news%s_%s.mp4/playlist.m3u8"
+    const_playlist_url_real_fmt = "http://strm.3news.co.nz/vod/_definst_/mp4:3news%s_%s.mp4/playlist.m3u8"
     const_video_filename_real_fmt = "%s_%s.mp4"
     video_speed = "700K"
     
