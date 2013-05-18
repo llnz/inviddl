@@ -3,7 +3,7 @@
 Find the pattern that fits the best, then subclass to add the specific 
 behavour as needed
 '''
-#    Copyright (C) 2012 by Lee Begg                                      
+#    Copyright (C) 2012, 2013 by Lee Begg                                      
 #    <llnz@paradise.net.nz>                                                             
 #
 #All rights reserved.
@@ -210,7 +210,7 @@ class Brightcove(VideoSite):
         playerid_param = extract_step('Extracting playerid parameter', 'unable to extract playerid parameter', self.const_playerid_param_re, page)
         experience_param = extract_step('Extracting experience parameter', 'unable to extract experience parameter', self.const_experience_param_re, page)
         videoplayer_param = extract_step('Extracting videoplayer parameter', 'unable to extract videoplayer parameter', self.const_videoplayer_param_re, page)
-        linkbase_param = extract_step('Extracting videoplayer parameter', 'unable to extract videoplayer parameter', self.const_linkbase_param_re, page)
+        linkbase_param = extract_step('Extracting linkbase parameter', 'unable to extract linkbase parameter', self.const_linkbase_param_re, page)
         
         inner_url_real = self.const_inner_url_format % (experience_param, playerid_param, videoplayer_param)
         

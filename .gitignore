@@ -1,4 +1,6 @@
 *~
 *.pyc
-*.kdevelop
-
+temp/
+.project
+.pydevproject
+.settings/

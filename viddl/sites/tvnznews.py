@@ -1,4 +1,4 @@
-#    Copyright (C) 2012, 2013 by Lee Begg                                      
+#    Copyright (C) 2013 by Lee Begg                                      
 #    <llnz@paradise.net.nz>                                                             
 #
 #All rights reserved.
