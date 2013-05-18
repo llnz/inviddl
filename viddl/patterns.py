@@ -32,6 +32,9 @@ behavour as needed
 from xml.etree import ElementTree as ET
 import sys, os
 import shutil
+import json
+import re
+import operator
 
 from viddl.steps import download_step, download_video_step, extract_step
 
@@ -186,3 +189,50 @@ class M3uPlaylistVarDownloadSite(VideoSite):
         
         shutil.rmtree(tmp_dir)
         
+class Brightcove(VideoSite):
+    '''Brightcove is a common Video streaming service.
+    '''
+    const_playerid_param_re = None
+    const_experience_param_re = None
+    const_videoplayer_param_re = None
+    const_linkbase_param_re = None
+    const_experiencejson_param_re = re.compile(r'var experienceJSON = (\{.*\});')
+       
+    const_inner_url_format = 'http://c.brightcove.com/services/viewer/htmlFederated?&width=640&height=360&flashID=%s&wmode=opaque&playerID=%s&isVid=true&isUI=true&dynamicStreaming=true&autoStart=true&@videoPlayer=%s'
+    
+    def download_from_url(self, url):
+        video_webpage = download_step(True, 'Retrieving video webpage', 'unable to retrieve video webpage', url)
+        
+        self.download_from_page(url, video_webpage)
+        
+    
+    def download_from_page(self, url, page):
+        playerid_param = extract_step('Extracting playerid parameter', 'unable to extract playerid parameter', self.const_playerid_param_re, page)
+        experience_param = extract_step('Extracting experience parameter', 'unable to extract experience parameter', self.const_experience_param_re, page)
+        videoplayer_param = extract_step('Extracting videoplayer parameter', 'unable to extract videoplayer parameter', self.const_videoplayer_param_re, page)
+        linkbase_param = extract_step('Extracting videoplayer parameter', 'unable to extract videoplayer parameter', self.const_linkbase_param_re, page)
+        
+        inner_url_real = self.const_inner_url_format % (experience_param, playerid_param, videoplayer_param)
+        
+        print "raw inner_url_real: ", inner_url_real
+        
+        inner_page = download_step(True, 'Retrieving video infor webpage', 'unable to retrieve video info webpage', inner_url_real, 
+                                   headers=[('User-Agent', 'Mozilla/5.0 (iPad; CPU OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3')])
+        
+        
+        experience_json_str = extract_step('Extracting experience json parameter', 'unable to extract experience json parameter', self.const_experiencejson_param_re, inner_page)
+        
+        experience_json = json.loads(experience_json_str)
+        
+        speed_url = []
+        for rendition in experience_json['data']['programmedContent']['videoPlayer']['mediaDTO']['renditions']:
+            speed_url.append((rendition['encodingRate'], rendition['defaultURL']))
+        
+        video_url_real = sorted(speed_url, key=operator.itemgetter(0), reverse=True)[0][1]
+        ext = video_url_real.split('.')[-1]
+        
+        video_filename = linkbase_param.split('/')[-1] + '.' + ext
+        
+        print video_url_real
+        
+        download_video_step(video_filename, video_url_real)

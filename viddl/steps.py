@@ -91,10 +91,10 @@ def perform_request(url, headers=None, data=None):
 
 #generic download step
 @retry
-def download_step(return_data_flag, step_title, step_error, url, post_data=None):
+def download_step(return_data_flag, step_title, step_error, url, post_data=None, headers=None):
         try:
                 print('%s... ' % step_title)
-                data = perform_request(url, data=post_data).read()
+                data = perform_request(url, headers=headers, data=post_data).read()
                 print('done.\n')
                 if return_data_flag:
                         return data
