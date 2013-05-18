@@ -200,12 +200,6 @@ class Brightcove(VideoSite):
        
     const_inner_url_format = 'http://c.brightcove.com/services/viewer/htmlFederated?&width=640&height=360&flashID=%s&wmode=opaque&playerID=%s&isVid=true&isUI=true&dynamicStreaming=true&autoStart=true&@videoPlayer=%s'
     
-    def download_from_url(self, url):
-        video_webpage = download_step(True, 'Retrieving video webpage', 'unable to retrieve video webpage', url)
-        
-        self.download_from_page(url, video_webpage)
-        
-    
     def download_from_page(self, url, page):
         playerid_param = extract_step('Extracting playerid parameter', 'unable to extract playerid parameter', self.const_playerid_param_re, page)
         experience_param = extract_step('Extracting experience parameter', 'unable to extract experience parameter', self.const_experience_param_re, page)
