@@ -3,7 +3,7 @@ Created on 12/01/2012
 
 @author: lee
 '''
-#    Copyright (C) 2009 by Lee Begg                                      
+#    Copyright (C) 2009, 2013 by Lee Begg                                      
 #    <llnz@paradise.net.nz>                                                             
 #
 #All rights reserved.
@@ -33,23 +33,14 @@ import re
 
 from viddl.patterns import FileVarDownloadSite
 from viddl.sites import register_site
-from viddl.steps import download_step, extract_step
 
 @register_site(r'http://(.*\.)?stuff\.co\.nz/')
 class Stuff(FileVarDownloadSite):
-    const_video_url_param_re = re.compile(r".*mediaXML:.*'http://([^']+)'.*")
+    const_video_url_param_re = re.compile(r'.*file:.*"http://([^"]+)".*')
     
-    const_xml_url_real_fmt = "http://%s"
-    const_video_real_url_param_re = re.compile(r'.*<media:content url="http://([^"]+)".*')
     const_video_url_real_fmt = "http://%s"
     
     def video_url_from_param(self, video_url_param):
-        xml_url_real = self.const_xml_url_real_fmt % (video_url_param)
-
-        xml_page = download_step(True, 'Retrieving XML page', 'unable to retrieve xml page', xml_url_real)
-
-        video_url_param = extract_step('Extract video url parameter', 'unable to extract video url parameter', self.const_video_real_url_param_re, xml_page)
-
         video_url_real = self.const_video_url_real_fmt % (video_url_param)
         
         return video_url_real
