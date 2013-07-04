@@ -30,7 +30,7 @@ from viddl.sites import register_site
 
 @register_site(r'http://(www\.)?tvnz\.co\.nz/[^/]*news/?',
                r'http://(www\.)?tvnz\.co\.nz/seven-sharp/',
-               r'http://trc\.taboola\.com/tvnz/.*url=http%3A%2F%2Ftvnz.co.nz%2F[^&]*news%2F')
+               r'http://trc\.taboola\.com/tvnz/.*url=http%3A%2F%2Ftvnz.co.nz%2F[^&]*(news|seven-sharp)%2F')
 class TvnzNews(Brightcove):
     const_playerid_param_re = re.compile(r'<param value="([^"]+)" name="playerID" />')
     const_experience_param_re = re.compile(r'<object .*id="([^"]+)" class="BrightcoveExperience ">')
