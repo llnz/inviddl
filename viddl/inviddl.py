@@ -30,7 +30,7 @@ import sys
 from viddl.sites import get_site
 
 #load site modules
-from viddl.sites import nz3news, stuff, ch9nz, nzfilmarchive, tvnznews, nzonscreen
+from viddl.sites import nz3news, stuff, ch9nz, nzfilmarchive, tvnznews, nzonscreen, tv3nz
 
 def main():
     
