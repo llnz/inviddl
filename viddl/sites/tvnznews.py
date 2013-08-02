@@ -27,6 +27,7 @@
 import re
 from viddl.patterns import Brightcove
 from viddl.sites import register_site
+from viddl.steps import extract_step
 
 @register_site(r'http://(www\.)?tvnz\.co\.nz/[^/]*news/?',
                r'http://(www\.)?tvnz\.co\.nz/seven-sharp/',
@@ -37,3 +38,10 @@ class TvnzNews(Brightcove):
     const_videoplayer_param_re = re.compile(r'<param value="([^"]+)" name="@videoPlayer" />')
     const_linkbase_param_re = re.compile(r'<param value="([^"]+)" name="linkBaseURL" />')
     
+    def get_filename(self, url, page, video_url):
+        linkbase_param = extract_step('Extracting linkbase parameter', 'unable to extract linkbase parameter', self.const_linkbase_param_re, page)
+        ext = video_url.split('.')[-1]
+        
+        video_filename = linkbase_param.split('/')[-1] + '.' + ext
+        
+        return video_filename

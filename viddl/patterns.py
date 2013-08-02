@@ -195,7 +195,6 @@ class Brightcove(VideoSite):
     const_playerid_param_re = None
     const_experience_param_re = None
     const_videoplayer_param_re = None
-    const_linkbase_param_re = None
     const_experiencejson_param_re = re.compile(r'var experienceJSON = (\{.*\});')
        
     const_inner_url_format = 'http://c.brightcove.com/services/viewer/htmlFederated?&width=640&height=360&flashID=%s&wmode=opaque&playerID=%s&isVid=true&isUI=true&dynamicStreaming=true&autoStart=true&@videoPlayer=%s'
@@ -204,13 +203,12 @@ class Brightcove(VideoSite):
         playerid_param = extract_step('Extracting playerid parameter', 'unable to extract playerid parameter', self.const_playerid_param_re, page)
         experience_param = extract_step('Extracting experience parameter', 'unable to extract experience parameter', self.const_experience_param_re, page)
         videoplayer_param = extract_step('Extracting videoplayer parameter', 'unable to extract videoplayer parameter', self.const_videoplayer_param_re, page)
-        linkbase_param = extract_step('Extracting linkbase parameter', 'unable to extract linkbase parameter', self.const_linkbase_param_re, page)
         
         inner_url_real = self.const_inner_url_format % (experience_param, playerid_param, videoplayer_param)
         
         print "raw inner_url_real: ", inner_url_real
         
-        inner_page = download_step(True, 'Retrieving video infor webpage', 'unable to retrieve video info webpage', inner_url_real, 
+        inner_page = download_step(True, 'Retrieving video info webpage', 'unable to retrieve video info webpage', inner_url_real, 
                                    headers=[('User-Agent', 'Mozilla/5.0 (iPad; CPU OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3')])
         
         
@@ -223,10 +221,12 @@ class Brightcove(VideoSite):
             speed_url.append((rendition['encodingRate'], rendition['defaultURL']))
         
         video_url_real = sorted(speed_url, key=operator.itemgetter(0), reverse=True)[0][1]
-        ext = video_url_real.split('.')[-1]
         
-        video_filename = linkbase_param.split('/')[-1] + '.' + ext
+        video_filename = self.get_filename(url, page, video_url_real)
         
         print video_url_real
         
         download_video_step(video_filename, video_url_real)
+        
+    def get_filename(self, url, page, video_url):
+        return video_url.split('/')[-1]
