@@ -28,7 +28,7 @@ import re
 from viddl.patterns import Brightcove
 from viddl.sites import register_site
 
-@register_site(r'http://([a-z0-9]+\.)voith.com')
+@register_site(r'http://([a-z0-9]+\.)?voith.com')
 class Voith(Brightcove):
     const_playerid_param_re = re.compile(r'<param name="playerID" value="([^"]+)" />')
     const_experience_param_re = re.compile(r'<object .*id="([^"]+)" class="BrightcoveExperience">')
