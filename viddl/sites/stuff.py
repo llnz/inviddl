@@ -37,8 +37,9 @@ from viddl.sites import register_site
 @register_site(r'http://(.*\.)?stuff\.co\.nz/',
                r'http://rss\.feedsportal\.com/c/35163/.*stuff0Bco0Bnz0C')
 class Stuff(FileVarDownloadSite):
-    const_video_url_param_re = re.compile(r'.*file:.*"http://([^"]+)".*')
-    
+    #const_video_url_param_re = re.compile(r'\s+url:.*"https?://([^"]+)".*')
+    const_video_url_param_re = re.compile(r'\s*file:.*"https?://([^"]+)".*')
+
     const_video_url_real_fmt = "http://%s"
     
     def video_url_from_param(self, video_url_param):

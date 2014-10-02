@@ -31,6 +31,8 @@ from viddl.steps import extract_step
 
 @register_site(r'http://(www\.)?tvnz\.co\.nz/[^/]*news/?',
                r'http://(www\.)?tvnz\.co\.nz/seven-sharp/',
+               r'http://(www\.)?tvnz\.co\.nz/[^/]*video/?',
+               r'http://(www\.)?tvnz\.co\.nz/',
                r'http://trc\.taboola\.com/tvnz/.*url=http%3A%2F%2Ftvnz.co.nz%2F[^&]*(news|seven-sharp)%2F')
 class TvnzNews(Brightcove):
     const_playerid_param_re = re.compile(r'<param value="([^"]+)" name="playerID" />')

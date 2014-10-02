@@ -1,5 +1,4 @@
-'''The main inviddl code'''
-#    Copyright (C) 2012, 2013 by Lee Begg                                      
+#    Copyright (C) 2014 by Lee Begg                                      
 #    <llnz@paradise.net.nz>                                                             
 #
 #All rights reserved.
@@ -24,38 +23,23 @@
 #LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
 #OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
 #OF THE POSSIBILITY OF SUCH DAMAGE.
-import sys
 
+import re
+from viddl.patterns import Brightcove
+from viddl.sites import register_site
+from viddl.steps import download_step
 
-from viddl.sites import get_site
+@register_site(r'http://([a-z0-9]+\.)?nzherald\.co\.nz')
+class NzHerald(Brightcove):
+    const_playerid_param_re = re.compile(r"<param name='playerID' value='([^']+)' />")
+    const_experience_param_re = re.compile(r"<object class='BrightcoveExperience' .*id='([^']+)'>")
+    const_videoplayer_param_re = re.compile(r"<param name='@videoPlayer' value='([^']+)' />")
 
-#load site modules
-from viddl.sites import nz3news, stuff, dunedintv, nzfilmarchive, tvnznews, nzonscreen, tv3nz, voith, nzherald
+    def download_from_url(self, url):
+        '''Rewrite urls to m.nzherald.co.nz'''
+        matches = re.match(r'(http://)([a-z0-9]+\.)?(nzherald\.co\.nz/.*)', url)
+        new_url = ''.join([matches.group(1), 'm.', matches.group(3)])
+        video_webpage = download_step(True, 'Retrieving video webpage', 'unable to retrieve video webpage', new_url)
+        
+        self.download_from_page(url, video_webpage)
 
-def main():
-    
-    #parse args
-    if len(sys.argv) != 2:
-        sys.exit('Usage: %s url [url ...]' % sys.argv[0])
-    urls = sys.argv[1:]
-    
-    
-    for url in urls:
-        #check url to find site
-        site = get_site(url)
-        #if found
-        if site is not None:
-            print 'Found site %s' % site.__class__.__name__
-            #site.download_from_url
-            site.download_from_url(url)
-        #else
-        else:
-            print "fail"
-            #download page
-            #check resulting url to find site
-            #if found
-                #site.download_from_page
-            #else
-                #try default downloaders
-    
-    pass

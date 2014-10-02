@@ -1,4 +1,4 @@
-#    Copyright (C) 2012 by Lee Begg                                      
+#    Copyright (C) 2012, 2013 by Lee Begg                                      
 #    <llnz@paradise.net.nz>                                                             
 #
 #All rights reserved.
@@ -29,7 +29,7 @@ import re
 from viddl.patterns import FileVarDownloadSite
 from viddl.sites import register_site
 
-@register_site(r'http://(www\.)?ch9\.co\.nz/')
+@register_site(r'http://(www\.)?dunedintv\.co\.nz/')
 class Ch9nz(FileVarDownloadSite):
     const_video_url_param_re = re.compile(r'flashvars="file=([^&]+)&')
     
