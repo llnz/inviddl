@@ -35,6 +35,7 @@ import shutil
 import json
 import re
 import operator
+import requests
 
 from viddl.steps import download_step, download_video_step, extract_step
 
@@ -146,7 +147,9 @@ class M3uPlaylistVarDownloadSite(VideoSite):
         
         print playlist_url_real
         
-        playlist_webpage = download_step(True, 'Retrieving playlist', 'unable to retrieve playlist', playlist_url_real)
+        session = requests.Session()
+        
+        playlist_webpage = download_step(True, 'Retrieving playlist', 'unable to retrieve playlist', playlist_url_real, session=session)
         
         chunklist_file = [line for line in playlist_webpage.splitlines() if line[0] != '#'][0]
         
@@ -156,7 +159,7 @@ class M3uPlaylistVarDownloadSite(VideoSite):
         
         print chunklist_url
         
-        chunklist_webpage = download_step(True, 'Retrieving chunklist', 'unable to retrieve chunklist', chunklist_url)
+        chunklist_webpage = download_step(True, 'Retrieving chunklist', 'unable to retrieve chunklist', chunklist_url, session=session)
         
         video_items = [line for line in chunklist_webpage.splitlines() if line[0] != '#']
         
@@ -172,7 +175,7 @@ class M3uPlaylistVarDownloadSite(VideoSite):
             real_item = video_item.split('?', 1)[0]
             real_video_items.append(real_item)
             if not os.path.exists(os.path.join(tmp_dir, real_item)):
-                download_video_step(os.path.join(tmp_dir, real_item + "_tmp"),  chunklist_url.rsplit('/', 1)[0] + '/' + video_item)
+                download_video_step(os.path.join(tmp_dir, real_item + "_tmp"),  chunklist_url.rsplit('/', 1)[0] + '/' + video_item, session=session)
                 shutil.move(os.path.join(tmp_dir, real_item + "_tmp"), os.path.join(tmp_dir, real_item))
         
         try:
@@ -215,7 +218,9 @@ class Brightcove(VideoSite):
         experience_json_str = extract_step('Extracting experience json parameter', 'unable to extract experience json parameter', self.const_experiencejson_param_re, inner_page)
         
         experience_json = json.loads(experience_json_str)
-        
+       
+        print experience_json
+ 
         speed_url = []
         for rendition in experience_json['data']['programmedContent']['videoPlayer']['mediaDTO']['renditions']:
             speed_url.append((rendition['encodingRate'], rendition['defaultURL']))
